@@ -1,0 +1,17 @@
+[general]
+name=Plugin Hub Workspace Manager
+qgisMinimumVersion=3.22
+description=Manage plugin workspaces - enable/disable groups of plugins with one click. Import workspaces from QGIS Plugin Hub.
+version=1.0.0
+author=QGIS Plugin Hub
+email=pluginhub@example.com
+about=A workspace manager for QGIS plugins, inspired by Chrome Extension Manager. Create workspaces, group plugins by use case (Remote Sensing, Cartography, etc.), and toggle entire groups on/off with a single click. Import workspace JSON files exported from the QGIS Plugin Hub web app.
+tracker=https://github.com/your-repo/qgis-plugin-hub/issues
+repository=https://github.com/your-repo/qgis-plugin-hub
+tags=plugins,management,workspace,groups,toggle
+homepage=https://your-repo.github.io/qgis-plugin-hub
+category=Plugins
+icon=icon.png
+experimental=True
+deprecated=False
+hasProcessingProvider=no

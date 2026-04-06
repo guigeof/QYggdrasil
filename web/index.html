@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QYggdrasil — Plugin Tree & Workflows</title>
+    <meta name="description"
+        content="Descubra, organize e gerencie plugins do QGIS com mapa mental taxonômico, métricas avançadas e listas personalizadas. Compartilhe suas coleções no GitHub.">
+    <meta name="keywords" content="QGIS, plugins, GIS, geospatial, taxonomy, mind map, plugin manager">
+    <meta name="author" content="QYggdrasil">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/translations.js"></script>
+</head>
+
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-logo">
+                <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+                    <circle cx="32" cy="32" r="28" stroke="url(#forest-grad)" stroke-width="3" fill="none"
+                        class="loading-ring" />
+                    <circle cx="32" cy="32" r="18" stroke="url(#amber-grad)" stroke-width="2" fill="none"
+                        class="loading-ring-inner" />
+                    <circle cx="32" cy="32" r="6" fill="url(#forest-grad)" />
+                    <defs>
+                        <linearGradient id="forest-grad" x1="0" y1="0" x2="64" y2="64">
+                            <stop offset="0%" stop-color="#10b981" />
+                            <stop offset="100%" stop-color="#065f46" />
+                        </linearGradient>
+                        <linearGradient id="amber-grad" x1="64" y1="0" x2="0" y2="64">
+                            <stop offset="0%" stop-color="#f59e0b" />
+                            <stop offset="100%" stop-color="#10b981" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            <h2 class="loading-title">QYggdrasil</h2>
+            <p class="loading-subtitle">Carregando <span id="loading-count">0</span> plugins...</p>
+            <div class="loading-bar">
+                <div class="loading-bar-fill"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="app" class="app hidden">
+        <!-- Sidebar Navigation -->
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <svg width="32" height="32" viewBox="0 0 64 64" fill="none">
+                        <circle cx="32" cy="32" r="28" stroke="url(#forest-grad)" stroke-width="3" fill="none" />
+                        <circle cx="32" cy="32" r="6" fill="url(#forest-grad)" />
+                        <line x1="32" y1="14" x2="32" y2="26" stroke="url(#forest-grad)" stroke-width="2" />
+                        <line x1="32" y1="38" x2="32" y2="50" stroke="url(#forest-grad)" stroke-width="2" />
+                        <line x1="14" y1="32" x2="26" y2="32" stroke="url(#forest-grad)" stroke-width="2" />
+                        <line x1="38" y1="32" x2="50" y2="32" stroke="url(#forest-grad)" stroke-width="2" />
+                        <defs>
+                            <linearGradient id="forest-grad" x1="0" y1="0" x2="64" y2="64">
+                                <stop offset="0%" stop-color="#10b981" />
+                                <stop offset="100%" stop-color="#065f46" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span class="sidebar-brand">QYggdrasil</span>
+                </div>
+                <select id="lang-selector" class="select-sm" style="margin-left:auto;width:55px;height:24px;font-size:11px;padding:0 4px;border-radius:4px">
+                    <option value="en">EN</option>
+                    <option value="pt">PT</option>
+                </select>
+            </div>
+            <ul class="sidebar-nav">
+                <li>
+                    <button class="nav-btn active" data-view="dashboard" id="nav-dashboard">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7" rx="1" />
+                            <rect x="14" y="3" width="7" height="7" rx="1" />
+                            <rect x="3" y="14" width="7" height="7" rx="1" />
+                            <rect x="14" y="14" width="7" height="7" rx="1" />
+                        </svg>
+                        <span data-i18n="dashboard">Dashboard</span>
+                    </button>
+                </li>
+                <li>
+                    <button class="nav-btn" data-view="taxonomy" id="nav-taxonomy">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="5" r="3" />
+                            <line x1="12" y1="8" x2="12" y2="14" />
+                            <circle cx="6" cy="19" r="3" />
+                            <circle cx="18" cy="19" r="3" />
+                            <line x1="12" y1="14" x2="6" y2="16" />
+                            <line x1="12" y1="14" x2="18" y2="16" />
+                        </svg>
+                        <span data-i18n="plugin_tree">Plugin Tree</span>
+                    </button>
+                </li>
+                <li>
+                    <button class="nav-btn" data-view="explorer" id="nav-explorer">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8" />
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                        </svg>
+                        <span data-i18n="explorer">Explorer</span>
+                    </button>
+                </li>
+                <li>
+                    <button class="nav-btn" data-view="metrics" id="nav-metrics">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="20" x2="18" y2="10" />
+                            <line x1="12" y1="20" x2="12" y2="4" />
+                            <line x1="6" y1="20" x2="6" y2="14" />
+                        </svg>
+                        <span data-i18n="metrics">Metrics</span>
+                    </button>
+                </li>
+                <li>
+                    <button class="nav-btn" data-view="workspaces" id="nav-workspaces">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="3" width="20" height="14" rx="2" />
+                            <line x1="8" y1="21" x2="16" y2="21" />
+                            <line x1="12" y1="17" x2="12" y2="21" />
+                        </svg>
+                        <span data-i18n="workspaces">Workspaces</span>
+                    </button>
+                </li>
+                <li>
+                    <button class="nav-btn" data-view="lists" id="nav-lists">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                            <polyline points="14 2 14 8 20 8" />
+                            <line x1="16" y1="13" x2="8" y2="13" />
+                            <line x1="16" y1="17" x2="8" y2="17" />
+                        </svg>
+                        <span data-i18n="my_lists">My Lists</span>
+                    </button>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <div class="sidebar-stats">
+                    <span id="sidebar-total-plugins">0</span> plugins
+                </div>
+                <a href="https://github.com/guigeof/" target="_blank" class="github-link">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                        <path
+                            d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                    </svg>
+                    GitHub
+                </a>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main id="main-content" class="main-content">
+            <!-- Dashboard View -->
+            <section id="view-dashboard" class="view active">
+                <header class="view-header">
+                    <div>
+                        <h1 data-i18n="dashboard">Dashboard</h1>
+                        <p class="view-subtitle"> QGIS plugins</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn btn-ghost" id="btn-refresh-data" title="Update data">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <polyline points="23 4 23 10 17 10" />
+                                <path d="M20.49 15a9 9 0 11-2.12-9.36L23 10" />
+                            </svg>
+                            <span data-i18n="update">Update</span>
+                        </button>
+                    </div>
+                </header>
+
+                <!-- Stats Cards -->
+                <div class="stats-grid" id="stats-grid">
+                    <div class="stat-card stat-card-primary">
+                        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M20.24 12.24a6 6 0 00-8.49-8.49L5 10.5V19h8.5z" />
+                            </svg></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-total">0</span>
+                            <span class="stat-label" data-i18n="total_plugins">Total Plugins</span>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-card-success">
+                        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+                            </svg></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-downloads">0</span>
+                            <span class="stat-label" data-i18n="total_downloads">Total Downloads</span>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-card-warning">
+                        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <polygon
+                                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                            </svg></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-avg-rating">0</span>
+                            <span class="stat-label" data-i18n="avg_rating">Avg. Rating</span>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-card-info">
+                        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                                <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                                <path d="M16 3.13a4 4 0 010 7.75" />
+                            </svg></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-authors">0</span>
+                            <span class="stat-label">Authors</span>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-card-purple">
+                        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z" />
+                                <line x1="7" y1="7" x2="7.01" y2="7" />
+                            </svg></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-tags">0</span>
+                            <span class="stat-label" data-i18n="unique_tags">Unique Tags</span>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-card-rose">
+                        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                                <line x1="16" y1="2" x2="16" y2="6" />
+                                <line x1="8" y1="2" x2="8" y2="6" />
+                                <line x1="3" y1="10" x2="21" y2="10" />
+                            </svg></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-updated">0</span>
+                            <span class="stat-label">Last Year Updates</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top Plugins & Top Tags -->
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 data-i18n="top_downloads">Top 10 — Most Downloaded</h3>
+                            <div class="filter-group">
+                                <select id="top-dl-year" class="select-sm">
+                                    <option value="all">Qualquer Ano</option>
+                                    <option value="2026">Novos (2026)</option>
+                                    <option value="2025">2025</option>
+                                    <option value="2024">2024</option>
+                                    <option value="old">Anteriores</option>
+                                </select>
+                                <select id="top-dl-period" class="select-sm">
+                                    <option value="all">Tendência: Geral</option>
+                                    <option value="month">Este Mês</option>
+                                    <option value="week">Esta Semana</option>
+                                    <option value="quarter">Este Trimestre</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="card-body" id="top-downloads-list"></div>
+                        <div class="card-footer" style="padding:.75rem 1.25rem;border-top:1px solid var(--border);text-align:center">
+                            <button class="btn btn-sm btn-ghost" id="btn-more-downloads">Ver mais plugins</button>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 data-i18n="top_rated">Top 10 — Highest Rated</h3>
+                            <div class="filter-group">
+                                <select id="top-rate-year" class="select-sm">
+                                    <option value="all" data-i18n="any_year">Any Year</option>
+                                    <option value="2026" data-i18n="new_2026">New (2026)</option>
+                                    <option value="2025">2025</option>
+                                    <option value="2024">2024</option>
+                                    <option value="old" data-i18n="old_plugins">Older</option>
+                                </select>
+                                <select id="top-rate-period" class="select-sm">
+                                    <option value="all" data-i18n="trend_all">Trending: All</option>
+                                    <option value="month" data-i18n="trend_month">This Month</option>
+                                    <option value="week" data-i18n="trend_week">This Week</option>
+                                    <option value="quarter" data-i18n="trend_quarter">This Quarter</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="card-body" id="top-rated-list"></div>
+                        <div class="card-footer" style="padding:.75rem 1.25rem;border-top:1px solid var(--border);text-align:center">
+                            <button class="btn btn-sm btn-ghost" id="btn-more-rated">Ver mais plugins</button>
+                        </div>
+                    </div>
+                    <div class="card card-wide">
+                        <div class="card-header">
+                            <h3 data-i18n="popular_tags">Popular Tags</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="tag-cloud" id="tag-cloud"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Taxonomy View -->
+            <section id="view-taxonomy" class="view">
+                <header class="view-header">
+                    <div>
+                        <h1 data-i18n="taxonomy_title">Plugin Tree</h1>
+                        <p class="view-subtitle" data-i18n="taxonomy_subtitle">Explore plugins organized by intuitive categories</p>
+                    </div>
+                    <div class="header-actions">
+                        <div class="filter-group" style="margin-right:1rem">
+                            <select id="tree-year" class="select-sm">
+                                <option value="all" data-i18n="any_year">Any Year</option>
+                                <option value="2026" data-i18n="new_2026">New (2026)</option>
+                                <option value="2025">2025</option>
+                                <option value="2024">2024</option>
+                                <option value="old" data-i18n="old_plugins">Older</option>
+                            </select>
+                            <select id="tree-period" class="select-sm">
+                                <option value="all" data-i18n="trend_all">Trending: All</option>
+                                <option value="month" data-i18n="trend_month">This Month</option>
+                                <option value="week" data-i18n="trend_week">This Week</option>
+                                <option value="quarter" data-i18n="trend_quarter">This Quarter</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-ghost" id="btn-expand-all" data-i18n="expand_all">Expand All</button>
+                        <button class="btn btn-ghost" id="btn-collapse-all" data-i18n="collapse_all">Collapse All</button>
+                    </div>
+                </header>
+                <div class="taxonomy-container">
+                    <div class="taxonomy-sidebar">
+                        <div class="taxonomy-search">
+                            <input type="text" id="taxonomy-search-input" data-i18n="search_tree" placeholder="Search tree..."
+                                class="input">
+                        </div>
+                        <div class="tree-container" id="taxonomy-tree"></div>
+                    </div>
+                    <div class="taxonomy-detail" id="taxonomy-detail">
+                        <div class="taxonomy-detail-empty">
+                            <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor"
+                                stroke-width="1.5" opacity="0.3">
+                                <circle cx="12" cy="5" r="3" />
+                                <line x1="12" y1="8" x2="12" y2="14" />
+                                <circle cx="6" cy="19" r="3" />
+                                <circle cx="18" cy="19" r="3" />
+                                <line x1="12" y1="14" x2="6" y2="16" />
+                                <line x1="12" y1="14" x2="18" y2="16" />
+                            </svg>
+                            <p>Selecione uma categoria ou tag na árvore para ver os plugins</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Explorer View -->
+            <section id="view-explorer" class="view">
+                <header class="view-header">
+                    <div>
+                        <h1 data-i18n="explorer_title">Explore Plugins</h1>
+                        <p class="view-subtitle" data-i18n="explorer_subtitle">Search, filter and find plugins for your workflow</p>
+                    </div>
+                </header>
+                <div class="explorer-toolbar">
+                    <div class="search-box">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="11" cy="11" r="8" />
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                        </svg>
+                        <input type="text" id="explorer-search"
+                            placeholder="Buscar plugins por nome, descrição, tag, autor..." class="input">
+                    </div>
+                    <div class="filter-group">
+                        <select id="filter-sort" class="select">
+                            <option value="downloads">Mais Baixados</option>
+                            <option value="rating">Melhor Avaliados</option>
+                            <option value="name">Nome (A-Z)</option>
+                            <option value="updated">Mais Recentes</option>
+                            <option value="created">Mais Antigos</option>
+                            <option value="votes">Mais Votados</option>
+                        </select>
+                        <select id="filter-status" class="select">
+                            <option value="all">Todos</option>
+                            <option value="stable">Estável</option>
+                            <option value="experimental">Experimental</option>
+                            <option value="trusted">Confiável</option>
+                            <option value="deprecated">Descontinuado</option>
+                        </select>
+                        <button class="btn btn-outline" id="btn-toggle-view" title="Alternar visualização">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7" />
+                                <rect x="14" y="3" width="7" height="7" />
+                                <rect x="3" y="14" width="7" height="7" />
+                                <rect x="14" y="14" width="7" height="7" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="explorer-info">
+                    <span id="explorer-count"></span> <span data-i18n="plugins_found">plugins found</span>
+                    <button class="btn btn-sm btn-accent" id="btn-add-selected-to-list" style="display:none" data-i18n="add_selected">
+                        + Add Selected to List
+                    </button>
+                </div>
+                <div class="plugin-grid" id="plugin-grid"></div>
+                <div class="pagination" id="pagination"></div>
+            </section>
+
+            <!-- Metrics View -->
+            <section id="view-metrics" class="view">
+                <header class="view-header">
+                    <div>
+                        <h1 data-i18n="metrics_title">Metrics & Analytics</h1>
+                        <p class="view-subtitle" data-i18n="metrics_subtitle">Detailed stats of the plugin ecosystem</p>
+                    </div>
+                </header>
+                <div class="metrics-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>📊 Distribuição por Categoria</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" id="chart-categories"></div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>📈 Downloads por Categoria</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" id="chart-downloads-cat"></div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>⭐ Distribuição de Ratings</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" id="chart-ratings"></div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>📅 Timeline de Criação</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" id="chart-timeline"></div>
+                        </div>
+                    </div>
+                    <div class="card card-wide">
+                        <div class="card-header">
+                            <h3>🔝 Top 20 Autores Mais Prolíficos</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" id="chart-authors"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Workspaces View -->
+            <section id="view-workspaces" class="view">
+                <header class="view-header">
+                    <div>
+                        <h1 data-i18n="workspaces_title">⚡ Workspaces</h1>
+                        <p class="view-subtitle" data-i18n="workspaces_subtitle">Manage plugin groups as an Extension Manager</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn" id="btn-download-companion" style="background:var(--accent);color:white;border:none">
+                            🔌 Get Desktop Plugin
+                        </button>
+                        <button class="btn btn-accent" id="btn-new-workspace" data-i18n="new_workspace">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg>
+                            New Workspace
+                        </button>
+                        <button class="btn btn-outline" id="btn-import-workspace" data-i18n="import">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                                <polyline points="17 8 12 3 7 8" />
+                                <line x1="12" y1="3" x2="12" y2="15" />
+                            </svg>
+                            Import
+                        </button>
+                        <input type="file" id="import-workspace-input" accept=".json" style="display:none">
+                    </div>
+                </header>
+                <div id="workspaces-container" class="workspaces-container"></div>
+            </section>
+
+            <!-- Lists View -->
+            <section id="view-lists" class="view">
+                <header class="view-header">
+                    <div>
+                        <h1 data-i18n="my_lists_title">My Lists</h1>
+                        <p class="view-subtitle" data-i18n="my_lists_subtitle">Create, manage and share personal plugin collections</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn btn-accent" id="btn-new-list" data-i18n="new_list">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg>
+                            New List
+                        </button>
+                        <button class="btn btn-outline" id="btn-import-list" data-i18n="import">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                                <polyline points="17 8 12 3 7 8" />
+                                <line x1="12" y1="3" x2="12" y2="15" />
+                            </svg>
+                            Import
+                        </button>
+                        <input type="file" id="import-file-input" accept=".json" style="display:none">
+                    </div>
+                </header>
+                <div id="lists-container" class="lists-container">
+                    <div class="lists-empty" id="lists-empty">
+                        <svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="currentColor"
+                            stroke-width="1" opacity="0.2">
+                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                            <polyline points="14 2 14 8 20 8" />
+                        </svg>
+                        <h3>Nenhuma lista criada</h3>
+                        <p>Crie uma nova lista ou importe um arquivo JSON para começar.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Plugin Detail Modal -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal" id="plugin-modal">
+            <button class="modal-close" id="modal-close">&times;</button>
+            <div class="modal-content" id="modal-content"></div>
+        </div>
+    </div>
+
+    <!-- New List Modal -->
+    <div class="modal-overlay" id="new-list-modal-overlay">
+        <div class="modal modal-sm" id="new-list-modal">
+            <button class="modal-close" id="new-list-modal-close">&times;</button>
+            <div class="modal-content">
+                <h2>Nova Lista</h2>
+                <div class="form-group">
+                    <label for="new-list-name">Nome da Lista</label>
+                    <input type="text" id="new-list-name" class="input" placeholder="Ex: Plugins para Remote Sensing">
+                </div>
+                <div class="form-group">
+                    <label for="new-list-desc">Descrição (opcional)</label>
+                    <textarea id="new-list-desc" class="input textarea"
+                        placeholder="Descrição da sua lista..."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-ghost" id="new-list-cancel">Cancelar</button>
+                    <button class="btn btn-accent" id="new-list-create">Criar Lista</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Workspace Modal -->
+    <div class="modal-overlay" id="ws-modal-overlay">
+        <div class="modal modal-sm" id="ws-modal">
+            <button class="modal-close"
+                onclick="document.getElementById('ws-modal-overlay').classList.remove('show')">&times;</button>
+            <div class="modal-content">
+                <h2>Novo Workspace</h2>
+                <div class="form-group">
+                    <label for="ws-name">Nome</label>
+                    <input type="text" id="ws-name" class="input" placeholder="Ex: Remote Sensing Workflow">
+                </div>
+                <div class="form-group">
+                    <label for="ws-desc">Descrição (opcional)</label>
+                    <textarea id="ws-desc" class="input textarea" placeholder="Descrição do workspace..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="ws-color">Cor</label>
+                    <select id="ws-color" class="select" style="width:100%">
+                        <option value="#6366f1">🟣 Roxo</option>
+                        <option value="#06b6d4">🔵 Ciano</option>
+                        <option value="#10b981">🟢 Verde</option>
+                        <option value="#f59e0b">🟡 Âmbar</option>
+                        <option value="#ef4444">🔴 Vermelho</option>
+                        <option value="#ec4899">🩷 Rosa</option>
+                        <option value="#8b5cf6">💜 Violeta</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-ghost"
+                        onclick="document.getElementById('ws-modal-overlay').classList.remove('show')">Cancelar</button>
+                    <button class="btn btn-accent" id="ws-create-btn">Criar Workspace</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="js/taxonomy-config.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
