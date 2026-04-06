@@ -160,4 +160,10 @@ A scheduled job (`sync_data.yml`) runs daily at midnight to:
 
 ---
 
-*Developed with ❤️ and Google Antigravity for friends of the QGIS Community.*
+* **Developed with ❤️ and Google Antigravity for friends of the QGIS Community.**
+
+---
+
+### 📘 Documentation
+For a detailed guide on using the Instrument Panel, refer to the [User Manual](file:///c:/Users/guilh/.gemini/antigravity/scratch/qgis-plugin-hub/USER_MANUAL.md).
+
