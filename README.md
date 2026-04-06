@@ -4,9 +4,10 @@ A professional, high-density workstation designed to **discover, organize, and M
 
 This project transforms the QGIS repository into an **Instrument Panel** for power users, providing advanced filtering, thematic categorization, and a companion plugin for seamless synchronization.
 
-
+[https://guigeof.github.io/QYggdrasil
+](https://guigeof.github.io/QYggdrasil)
 [<img width="1293" height="646" alt="image" src="https://github.com/user-attachments/assets/c45b4312-1286-47d6-95de-c1feaf455143" />
-]([url](https://guigeof.github.io/QYggdrasil/))
+]([https://guigeof.github.io/QYggdrasil]
 ---
 
 ## 🚀 Key Features
