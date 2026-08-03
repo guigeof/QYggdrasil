@@ -18,7 +18,7 @@ def zip_directory(path, zip_file_name):
 
 if __name__ == "__main__":
     plugin_src = os.path.join("qgis_plugin", "workspace_manager")
-    output_zip = os.path.join("web", "workspace_manager.zip")
+    output_zip = "workspace_manager.zip"
 
     if os.path.exists(plugin_src):
         zip_directory(plugin_src, output_zip)
