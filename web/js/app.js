@@ -319,7 +319,7 @@ function applyFilters() {
   };
   filteredPlugins.sort(sortFns[sort] || sortFns.downloads);
 
-  document.getElementById('explorer-count').textContent = `${filteredPlugins.length} plugins encontrados`;
+  document.getElementById('explorer-count').textContent = `${filteredPlugins.length} ${TRANSLATIONS[currentLang].plugins_found}`;
   renderPluginGrid();
   renderPagination();
 }
@@ -916,7 +916,7 @@ function importWorkspace(e) {
         let realId = p.plugin_id;
         // If imported directly from QGIS, it might only have qgis_name
         if (!realId && p.qgis_name) {
-          const matched = window.allPluginsData.find(x => 
+          const matched = allPlugins.find(x => 
             (x.file_name && x.file_name.split('.')[0] === p.qgis_name) ||
             (x.name.replace(/\s+/g,'') === p.qgis_name)
           );
