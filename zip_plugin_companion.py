@@ -22,5 +22,13 @@ if __name__ == "__main__":
 
     if os.path.exists(plugin_src):
         zip_directory(plugin_src, output_zip)
+        
+        # Also copy to web/ folder for GitHub Pages deployment
+        web_dir = "web"
+        if os.path.exists(web_dir):
+            import shutil
+            web_zip = os.path.join(web_dir, "workspace_manager.zip")
+            shutil.copy2(output_zip, web_zip)
+            print(f"📦 Copied to web deployment folder: {os.path.abspath(web_zip)}")
     else:
         print(f"❌ Error: Plugin directory '{plugin_src}' not found.")
