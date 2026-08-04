@@ -163,6 +163,29 @@
                     </div>
                 </header>
 
+                <!-- Plugin Companion Hero Banner -->
+                <div class="plugin-hero-card">
+                    <div class="plugin-hero-badge">⚡ QGIS COMPANION PLUGIN v1.1</div>
+                    <h2 class="plugin-hero-title">Gerencie Workspaces & Economize Memória no QGIS</h2>
+                    <p class="plugin-hero-desc">
+                        Crie grupos de plugins por cenário de trabalho (Sensoriamento Remoto, Cartografia, Hidrologia) e alterne com 1 clique. 
+                        Plugins desativados têm seu carregamento bloqueado na inicialização do QGIS via <code>QgsSettings</code>, reduzindo o tempo de boot e liberando memória RAM.
+                    </p>
+                    <div class="plugin-hero-actions">
+                        <button class="btn btn-accent btn-lg" onclick="downloadPluginZip()">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            <span>Baixar Plugin QGIS (.zip)</span>
+                        </button>
+                        <button class="btn btn-outline btn-lg" onclick="openPluginGuideModal()">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                            <span>Como Funciona / Guia</span>
+                        </button>
+                        <button class="btn btn-ghost btn-lg" onclick="document.getElementById('nav-workspaces').click()">
+                            <span>⚡ Ir para Workspaces</span>
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Stats Cards -->
                 <div class="stats-grid" id="stats-grid">
                     <div class="stat-card stat-card-primary">
@@ -603,6 +626,60 @@
                     <button class="btn btn-ghost"
                         onclick="document.getElementById('ws-modal-overlay').classList.remove('show')">Cancelar</button>
                     <button class="btn btn-accent" id="ws-create-btn">Criar Workspace</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Plugin Guide Modal -->
+    <div class="modal-overlay" id="plugin-guide-modal-overlay">
+        <div class="modal modal-md" id="plugin-guide-modal">
+            <button class="modal-close" onclick="document.getElementById('plugin-guide-modal-overlay').classList.remove('show')">&times;</button>
+            <div class="modal-content">
+                <h2>🔌 QYggdrasil Workspace Manager — Guia Completo</h2>
+                <p style="color:var(--text-secondary);font-size:.9rem;margin-bottom:1.25rem">
+                    O plugin oficial para QGIS Desktop que sincroniza com o Web Hub e gerencia conjuntos de plugins.
+                </p>
+
+                <div class="guide-step">
+                    <div class="guide-step-num">1</div>
+                    <div class="guide-step-body">
+                        <h3>Como Instalar no QGIS</h3>
+                        <ol>
+                            <li>Clique no botão <strong>Baixar Plugin QGIS (.zip)</strong> para baixar o <code>workspace_manager.zip</code>.</li>
+                            <li>Abra o QGIS Desktop e vá no menu: <strong>Complementos &gt; Gerenciar e Instalar Complementos</strong>.</li>
+                            <li>Acesse a aba <strong>Instalar a partir do ZIP</strong>.</li>
+                            <li>Selecione o arquivo <code>workspace_manager.zip</code> e clique em <strong>Instalar Complemento</strong>.</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="guide-step">
+                    <div class="guide-step-num">2</div>
+                    <div class="guide-step-body">
+                        <h3>Como Montar &amp; Sincronizar Workspaces</h3>
+                        <ul>
+                            <li><strong>⚡ Snapshot Automático:</strong> No plugin QGIS, clique em <code>⚡ From Active</code> para capturar instantaneamente todos os plugins que você está usando agora como um novo Workspace.</li>
+                            <li><strong>💾 Exportar &amp; Compartilhar:</strong> Exporte arquivos <code>.json</code> no QGIS ou no Web Hub para importar em outras máquinas ou compartilhar com sua equipe.</li>
+                            <li><strong>▶ Ativar / ⏸ Desativar em 1 Clique:</strong> Alterne entre perfis de trabalho (ex: "Sensoriamento Remoto" vs "Cartografia") com um único clique.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="guide-step">
+                    <div class="guide-step-num">3</div>
+                    <div class="guide-step-body">
+                        <h3>Como Funciona a Economia de Memória RAM</h3>
+                        <p>
+                            Ao clicar em <code>⏸ Disable All</code> ou desativar um workspace, o plugin atualiza o registro interno nativo do QGIS (<code>QgsSettings</code>).
+                            Dessa forma, no próximo boot do QGIS, os plugins desativados <strong>NÃO são carregados na memória</strong>, acelerando a inicialização do programa.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="form-actions" style="margin-top:1.5rem">
+                    <button class="btn btn-accent" onclick="downloadPluginZip()">⬇ Baixar Plugin ZIP</button>
+                    <button class="btn btn-ghost" onclick="document.getElementById('plugin-guide-modal-overlay').classList.remove('show')">Fechar</button>
                 </div>
             </div>
         </div>

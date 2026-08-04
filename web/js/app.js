@@ -1095,3 +1095,20 @@ function downloadScript(wsId) {
   toast('Script downloaded!','success');
 }
 
+// ============ PLUGIN ZIP & GUIDE MODAL ============
+function downloadPluginZip() {
+  const link = document.createElement('a');
+  link.href = 'workspace_manager.zip';
+  link.download = 'workspace_manager.zip';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  toast('⚡ Download do Plugin QGIS iniciado!', 'success');
+}
+
+function openPluginGuideModal() {
+  const overlay = document.getElementById('plugin-guide-modal-overlay');
+  if (overlay) overlay.classList.add('show');
+}
+
+
