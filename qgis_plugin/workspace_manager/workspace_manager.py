@@ -17,7 +17,7 @@ from qgis.PyQt.QtWidgets import (
 )
 from qgis.PyQt.QtCore import Qt, QSize, QCoreApplication, QUrl
 from qgis.PyQt.QtGui import QIcon, QColor, QFont, QDesktopServices
-from qgis.core import QgsApplication
+from qgis.core import QgsApplication, QgsSettings
 from qgis.utils import loadPlugin, startPlugin, unloadPlugin, active_plugins, available_plugins
 
 WEB_HUB_URL = "https://guigeof.github.io/QYggdrasil"
@@ -488,11 +488,22 @@ class WorkspaceDialog(QDialog):
         return group
 
     # -- Operations --
+    def _set_plugin_qsettings(self, pid, enable):
+        """Update QGIS internal QSettings so QGIS startup and standard Plugin Manager respect the state."""
+        try:
+            settings = QgsSettings()
+            settings.setValue(f"/PythonPlugins/{pid}", enable)
+        except Exception:
+            pass
+
     def _toggle_all(self, idx, enable):
         ws = self.workspaces[idx]
         for p in ws.get('plugins', []):
             p['enabled'] = enable
             pid = p.get('plugin_id')
+            if not pid:
+                continue
+            self._set_plugin_qsettings(pid, enable)
             if enable and pid in available_plugins:
                 try:
                     loadPlugin(pid)
@@ -513,6 +524,7 @@ class WorkspaceDialog(QDialog):
 
     def _enable_plugin(self, pid):
         try:
+            self._set_plugin_qsettings(pid, True)
             loadPlugin(pid)
             startPlugin(pid)
             self._refresh()
@@ -521,6 +533,7 @@ class WorkspaceDialog(QDialog):
 
     def _disable_plugin(self, pid):
         try:
+            self._set_plugin_qsettings(pid, False)
             unloadPlugin(pid)
             self._refresh()
         except Exception as e:
