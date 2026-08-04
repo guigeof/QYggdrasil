@@ -733,7 +733,7 @@ function setupWorkspaces() {
   document.getElementById('btn-import-workspace')?.addEventListener('click', () => document.getElementById('import-workspace-input').click());
   document.getElementById('import-workspace-input')?.addEventListener('change', importWorkspace);
   document.getElementById('btn-download-companion')?.addEventListener('click', () => {
-    window.location.href = 'workspace_manager.zip';
+    downloadPluginZip();
   });
   renderWorkspaces();
 }
@@ -846,7 +846,7 @@ function addToWorkspace(wsId, pluginId) {
   if (!ws || ws.plugins.find(p=>p.plugin_id===pluginId)) return;
   ws.plugins.push({ plugin_id: pluginId, enabled: true });
   saveWorkspaces(); renderWorkspaces();
-  const p = allPlugins.find(x=>x.plugin_id===pluginId);
+  const p = allPlugins.find(x => x.plugin_id === pluginId);
   toast(`${p?.name} adicionado ao workspace!`, 'success');
 }
 
@@ -898,7 +898,9 @@ function exportWorkspace(wsId) {
     }).filter(Boolean)
   };
   const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`qgis-workspace-${ws.name.replace(/\s+/g,'-')}.json`; a.click();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = `qgis-workspace-${ws.name.replace(/\s+/g,'-').toLowerCase()}.json`; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
   toast('Workspace exportado!','success');
 }
 
@@ -908,13 +910,49 @@ function importWorkspace(e) {
   reader.onload = ev => {
     try {
       const d = JSON.parse(ev.target.result);
-      
+
+      // Support batch workspace export JSON from QGIS plugin or Web Hub
+      if (d && Array.isArray(d.workspaces)) {
+        let importedCount = 0;
+        for (const wsItem of d.workspaces) {
+          if (!wsItem || !wsItem.name) continue;
+          const pluginsList = [];
+          const srcArray = wsItem.plugins || wsItem.pluginDetails || [];
+          for (const p of srcArray) {
+            let realId = typeof p === 'string' ? p : p.plugin_id;
+            if (!realId && p.qgis_name) {
+              const matched = allPlugins.find(x => 
+                (x.file_name && x.file_name.split('.')[0] === p.qgis_name) ||
+                (x.name.replace(/\s+/g,'') === p.qgis_name)
+              );
+              if (matched) realId = matched.plugin_id;
+            }
+            if (realId) {
+              pluginsList.push({ plugin_id: realId, enabled: typeof p === 'object' ? p.enabled !== false : true });
+            }
+          }
+          workspaces.push({
+            id: Date.now().toString() + '_' + Math.random().toString(36).substr(2, 4),
+            name: wsItem.name,
+            description: wsItem.description || '',
+            color: wsItem.color || '#6366f1',
+            plugins: pluginsList,
+            active: true,
+            created: new Date().toISOString()
+          });
+          importedCount++;
+        }
+        saveWorkspaces(); renderWorkspaces();
+        toast(`${importedCount} workspaces importados com sucesso!`, 'success');
+        return;
+      }
+
+      // Single workspace import
       const importedPlugins = [];
       const srcArray = d.pluginDetails || d.plugins || [];
       
       for (const p of srcArray) {
-        let realId = p.plugin_id;
-        // If imported directly from QGIS, it might only have qgis_name
+        let realId = typeof p === 'string' ? p : p.plugin_id;
         if (!realId && p.qgis_name) {
           const matched = allPlugins.find(x => 
             (x.file_name && x.file_name.split('.')[0] === p.qgis_name) ||
@@ -923,13 +961,13 @@ function importWorkspace(e) {
           if (matched) realId = matched.plugin_id;
         }
         if (realId) {
-          importedPlugins.push({ plugin_id: realId, enabled: p.enabled !== false });
+          importedPlugins.push({ plugin_id: realId, enabled: typeof p === 'object' ? p.enabled !== false : true });
         }
       }
 
       const ws = { 
         id: Date.now().toString(), 
-        name: d.name || 'Importado de QGIS', 
+        name: d.name || file.name.replace('.json',''), 
         description: d.description || '', 
         color: d.color || '#6366f1', 
         plugins: importedPlugins, 
@@ -938,8 +976,11 @@ function importWorkspace(e) {
       };
       
       workspaces.push(ws); saveWorkspaces(); renderWorkspaces();
-      toast(`Workspace "${ws.name}" importado!`,'success');
-    } catch(err) { toast('JSON inválido','error'); }
+      toast(`Workspace "${ws.name}" importado!`, 'success');
+    } catch(err) {
+      console.error('Import error:', err);
+      toast('JSON inválido','error');
+    }
   };
   reader.readAsText(file); e.target.value='';
 }
