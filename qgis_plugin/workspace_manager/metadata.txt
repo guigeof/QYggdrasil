@@ -1,14 +1,14 @@
 [general]
 name=QYggdrasil Workspace Manager
 qgisMinimumVersion=3.22
-description=Manage QGIS plugin workspaces — enable/disable groups with one click. Create workspaces from active plugins, export/import JSON, and access QYggdrasil Web Hub directly.
-version=1.1.0
+description=Fast Start & Manage QGIS plugin workspaces — enable/disable groups with one click. Create workspaces from active plugins, export/import JSON, and access QYggdrasil Web Hub directly.
+version=1.2.1
 author=guigeof
-email=guigeof@users.noreply.github.com
+email=gaiusalbusviolet@gmail.com
 about=A workspace manager for QGIS plugins, companion to the QYggdrasil Web Hub. Create workspaces, group plugins by use case (Remote Sensing, Cartography, Hydrology, etc.), toggle entire groups on/off, snapshot active plugins, export/import JSON workspaces, and batch-install missing plugins. Inspired by Chrome Extension Manager.
 tracker=https://github.com/guigeof/QYggdrasil/issues
 repository=https://github.com/guigeof/QYggdrasil
-tags=plugins,management,workspace,groups,toggle,qyggdrasil
+tags=plugins,management,workspace,groups,toggle,disable,fast_start,qyggdrasil,brasil,brazil,br,UnB
 homepage=https://guigeof.github.io/QYggdrasil
 category=Plugins
 icon=icon.png
