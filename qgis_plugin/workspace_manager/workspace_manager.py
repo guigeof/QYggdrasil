@@ -675,21 +675,86 @@ class WorkspaceDialog(QDialog):
         self._start_batch_install()
 
     def _start_batch_install(self):
-        self._batch_done = False
         self._progress = InstallProgressDialog(self, len(self.MissingPids) > 1)
         self._progress.log(f"▶ Starting install for {len(self.MissingPids)} plugins...")
         self._progress.show()
 
+        # Let the dialog show up, then start thread
+        from qgis.PyQt.QtCore import QTimer
+        QTimer.singleShot(100, self._run_installation_thread)
+
+    def _run_installation_thread(self):
+        self.worker = InstallWorker(self.MissingPids)
+        self.worker.log_msg.connect(self._progress.log)
+        self.worker.status_msg.connect(self._progress.set_status)
+        self.worker.progress_val.connect(self._progress.set_progress)
+        self.worker.install_request.connect(self._handle_install_request)
+        self.worker.finished.connect(self._on_install_finished)
+        self.worker.start()
+
+    def _handle_install_request(self, target):
+        import pyplugin_installer
+        from qgis.utils import unloadPlugin, active_plugins
+        from qgis.core import QgsSettings
+
+        success = False
+        try:
+            installer_inst = pyplugin_installer.instance()
+            if installer_inst.installPlugin(target):
+                success = True
+
+                # Disabled by default
+                try:
+                    settings = QgsSettings()
+                    settings.setValue(f"/PythonPlugins/{target}", False)
+                    if target in active_plugins:
+                        unloadPlugin(target)
+                except Exception:
+                    pass
+        except Exception:
+            pass
+
+        if hasattr(self, 'worker'):
+            self.worker.on_install_done(success)
+
+    def _on_install_finished(self, success_count, total_count):
+        self._progress.log(f"▶ Batch complete. Successfully installed {success_count}/{total_count} plugins.")
+        self._progress.progress.setRange(0, 100)
+        self._progress.progress.setValue(100)
+        self._progress.btn_close.setEnabled(True)
+        if self._progress.cb_autoclose.isChecked():
+            self._progress.accept()
+        self._refresh()
+
+
+from qgis.PyQt.QtCore import QThread, pyqtSignal
+from qgis.core import QgsSettings
+
+class InstallWorker(QThread):
+    log_msg = pyqtSignal(str)
+    status_msg = pyqtSignal(str)
+    progress_val = pyqtSignal(int, int)
+    finished = pyqtSignal(int, int)
+    # Signal emitted when we need main thread to do the GUI install/unload
+    install_request = pyqtSignal(str)
+
+    def __init__(self, pids):
+        super().__init__()
+        self.pids = pids
+        self.current_install_success = False
+        self.waiting_for_install = False
+
+    def on_install_done(self, success):
+        self.current_install_success = success
+        self.waiting_for_install = False
+
+    def run(self):
+        import time
         try:
             try:
                 from pyplugin_installer.installer_data import repositories, plugins
             except ImportError:
-                try:
-                    from pyplugin_installer import repositories, plugins
-                except ImportError:
-                    import pyplugin_installer
-                    repositories = getattr(pyplugin_installer, 'repositories', None)
-                    plugins = getattr(pyplugin_installer, 'plugins', None)
+                from pyplugin_installer import repositories, plugins
 
             if repositories:
                 repositories.load()
@@ -701,44 +766,16 @@ class WorkspaceDialog(QDialog):
                         r['enabled'] = True
 
                 for k in repositories.allEnabled():
-                    self._progress.log(f"  [-] Fetching repository: {k}")
+                    self.log_msg.emit(f"  [-] Fetching repository: {k}")
                     repositories.requestFetching(k, force_reload=True)
 
-                if hasattr(repositories, 'checkingDone'):
-                    repositories.checkingDone.connect(self._on_repos_ready)
-            
-            from qgis.PyQt.QtCore import QTimer
-            QTimer.singleShot(8000, lambda: self._on_repos_ready() if not self._batch_done else None)
-        except Exception as e:
-            self._progress.log(f"❌ Error setting up installer: {e}")
-            self._progress.btn_close.setEnabled(True)
+                # Wait up to 10 seconds for repositories to be ready
+                wait_time = 0
+                while getattr(repositories, 'fetching', False) and wait_time < 100:
+                    time.sleep(0.1)
+                    wait_time += 1
 
-    def _on_repos_ready(self):
-        if getattr(self, '_batch_done', False):
-            return
-        self._batch_done = True
-
-        try:
-            try:
-                from pyplugin_installer.installer_data import repositories, plugins
-            except ImportError:
-                from pyplugin_installer import repositories, plugins
-
-            if hasattr(repositories, 'checkingDone'):
-                try:
-                    repositories.checkingDone.disconnect(self._on_repos_ready)
-                except Exception:
-                    pass
-        except Exception:
-            pass
-
-        self._progress.log("▶ Repositories ready. Searching plugins...")
-        try:
-            try:
-                from pyplugin_installer.installer_data import plugins
-            except ImportError:
-                from pyplugin_installer import plugins
-
+            self.log_msg.emit("▶ Repositories ready. Searching plugins...")
             import pyplugin_installer
 
             if hasattr(plugins, 'rebuild'):
@@ -749,10 +786,11 @@ class WorkspaceDialog(QDialog):
                 return str(s).replace(' ', '').replace('-', '').replace('_', '').lower()
 
             success = 0
-            for i, pid in enumerate(self.MissingPids):
-                self._progress.set_status(f"Installing {i+1}/{len(self.MissingPids)}: {pid}...")
-                self._progress.log(f"  [-] Searching repository for: {pid}")
-                QCoreApplication.processEvents()
+            total = len(self.pids)
+            for i, pid in enumerate(self.pids):
+                self.progress_val.emit(i, total)
+                self.status_msg.emit(f"Installing {i+1}/{total}: {pid}...")
+                self.log_msg.emit(f"  [-] Searching repository for: {pid}")
 
                 target = None
                 n_pid = norm(pid)
@@ -764,24 +802,31 @@ class WorkspaceDialog(QDialog):
                         break
 
                 if target:
-                    self._progress.log(f"      [~] Found '{target}'. Downloading & installing...")
-                    QCoreApplication.processEvents()
-                    installer_inst = pyplugin_installer.instance()
-                    if installer_inst.installPlugin(target):
-                        self._progress.log(f"      [✓] Installed successfully: {target}")
+                    self.log_msg.emit(f"      [~] Found '{target}'. Downloading & installing...")
+
+                    # Request the main thread to do the actual installation
+                    self.waiting_for_install = True
+                    self.install_request.emit(target)
+
+                    # Wait for main thread to finish installing
+                    wait_time = 0
+                    while self.waiting_for_install and wait_time < 600: # 60 sec timeout
+                        time.sleep(0.1)
+                        wait_time += 1
+
+                    if getattr(self, 'current_install_success', False):
+                        self.log_msg.emit(f"      [✓] Installed successfully: {target}")
                         success += 1
                     else:
-                        err = getattr(installer_inst, 'message', 'Installation error')
-                        self._progress.log(f"      [x] Failed: {err}")
+                        self.log_msg.emit(f"      [x] Failed to install {target}")
                 else:
-                    self._progress.log(f"      [x] Plugin '{pid}' not found in QGIS repository.")
+                    self.log_msg.emit(f"      [x] Plugin '{pid}' not found in QGIS repository.")
 
-            self._progress.log(f"▶ Batch complete. Successfully installed {success}/{len(self.MissingPids)} plugins.")
+            self.progress_val.emit(total, total)
+            self.finished.emit(success, total)
         except Exception as e:
-            self._progress.log(f"❌ Error during installation: {e}")
-
-        self._progress.btn_close.setEnabled(True)
-        self._refresh()
+            self.log_msg.emit(f"❌ Error during installation: {e}")
+            self.finished.emit(0, len(self.pids))
 
 
 class InstallProgressDialog(QDialog):
@@ -790,15 +835,19 @@ class InstallProgressDialog(QDialog):
     def __init__(self, parent, is_batch=False):
         super().__init__(parent)
         self.setWindowTitle("Plugin Installation Engine")
-        self.resize(540, 440)
+        self.resize(600, 480)
         self.setStyleSheet("""
             QDialog { background: #0b0f19; color: white; font-family: 'Segoe UI', system-ui, sans-serif; }
             QLabel { color: #818cf8; }
             QPlainTextEdit { background: #020617; border: 1px solid #1e293b; color: #38bdf8; font-family: monospace; font-size: 12px; border-radius: 6px; }
-            QProgressBar { border: 1px solid #334155; border-radius: 6px; text-align: center; color: white; }
+            QProgressBar { border: 1px solid #334155; border-radius: 6px; text-align: center; color: white; background: #020617; }
             QProgressBar::chunk { background: #6366f1; border-radius: 4px; }
             QPushButton { background: #334155; color: white; border-radius: 6px; padding: 6px 18px; font-weight: 600; }
             QPushButton:hover { background: #475569; }
+            QPushButton:disabled { background: #1e293b; color: #64748b; }
+            QCheckBox { color: #cbd5e1; }
+            QCheckBox::indicator { width: 18px; height: 18px; border-radius: 4px; border: 1px solid #334155; background: #0f172a; }
+            QCheckBox::indicator:checked { background: #6366f1; border: 1px solid #6366f1; }
         """)
         layout = QVBoxLayout(self)
 
@@ -807,20 +856,38 @@ class InstallProgressDialog(QDialog):
         layout.addWidget(self.status_lbl)
 
         self.progress = QProgressBar()
-        self.progress.setRange(0, 0)
+        self.progress.setRange(0, 100)
+        self.progress.setValue(0)
         layout.addWidget(self.progress)
 
         self.log_area = QPlainTextEdit()
         self.log_area.setReadOnly(True)
         layout.addWidget(self.log_area)
 
+        bottom_layout = QHBoxLayout()
+        self.cb_autoclose = QCheckBox("Auto-close on finish")
+        self.cb_autoclose.setChecked(True)
+        bottom_layout.addWidget(self.cb_autoclose)
+
+        bottom_layout.addStretch()
+
+        self.btn_minimize = QPushButton("Minimize")
+        self.btn_minimize.clicked.connect(self.showMinimized)
+        bottom_layout.addWidget(self.btn_minimize)
+
         self.btn_close = QPushButton("Close")
         self.btn_close.setEnabled(False)
         self.btn_close.clicked.connect(self.accept)
-        layout.addWidget(self.btn_close)
+        bottom_layout.addWidget(self.btn_close)
+
+        layout.addLayout(bottom_layout)
 
     def log(self, txt):
         self.log_area.appendPlainText(txt)
 
     def set_status(self, txt):
         self.status_lbl.setText(txt)
+
+    def set_progress(self, val, total):
+        self.progress.setRange(0, total)
+        self.progress.setValue(val)
