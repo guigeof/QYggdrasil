@@ -653,7 +653,7 @@ function renderLists() {
       <div class="list-card-header"><h3>${list.name}</h3><span class="list-card-count">${list.plugins.length} plugins</span></div>
       ${list.description ? `<div class="list-card-desc">${list.description}</div>` : ''}
       <div class="list-card-items">${pluginDetails.length ? pluginDetails.map(p =>
-        `<div class="list-plugin-item"><span>${p.name}</span><button class="btn btn-sm btn-ghost" onclick="removeFromList('${list.id}','${p.plugin_id}')">✕</button></div>`
+        `<div class="list-plugin-item"><span>${p.name}</span><button class="btn btn-sm btn-ghost" onclick="removeFromList('${list.id}','${p.plugin_id}')" aria-label="Remover Plugin da Lista" title="Remover Plugin">✕</button></div>`
       ).join('') : '<div style="color:var(--text-muted);font-size:.8rem;padding:.5rem 0">Lista vazia — adicione plugins pelo Explorer</div>'}</div>
       <div class="list-card-footer">
         <button class="btn btn-sm btn-ghost" onclick="exportList('${list.id}')">⬇ Exportar JSON</button>
@@ -813,7 +813,7 @@ function renderWorkspaces() {
             <label class="toggle"><input type="checkbox" ${wp.enabled?'checked':''} onchange="toggleWsPlugin('${ws.id}','${wp.plugin_id}',this.checked)"><span class="toggle-slider" style="--accent:${ws.color}"></span></label>
             <span class="ws-plugin-name" onclick="showPluginDetail('${p.plugin_id}')">${p.name}</span>
             <span class="ws-plugin-meta">v${p.version}</span>
-            <button class="btn btn-sm btn-ghost" onclick="removeWsPlugin('${ws.id}','${wp.plugin_id}')" title="Remover">✕</button>
+            <button class="btn btn-sm btn-ghost" onclick="removeWsPlugin('${ws.id}','${wp.plugin_id}')" aria-label="Remover Plugin do Workspace" title="Remover">✕</button>
           </div>`;
         }).join('')}
         ${!ws.plugins.length ? '<div style="color:var(--text-muted);font-size:.8rem;padding:.5rem;grid-column:1/-1">Busque e adicione plugins acima ↑</div>' : ''}

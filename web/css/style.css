@@ -1671,4 +1671,17 @@ a:hover {
 
 .guide-step-body li {
   margin-bottom: 0.3rem;
-}
+}
+/* Keyboard Accessibility Focus State (Issue #41) */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+.btn:focus-visible,
+.qbtn:focus-visible,
+.nav-btn:focus-visible,
+.modal-close:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
