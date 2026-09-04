@@ -348,8 +348,8 @@ function renderPluginGrid() {
         <span class="plugin-stat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>${fmt(p.downloads)}</span>
         <span class="plugin-stat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>${p.average_vote.toFixed(1)}</span>
         <span class="plugin-card-quick">
-          <button class="qbtn" onclick="event.stopPropagation();quickFavorite('${p.plugin_id}')" title="Add to Favorites">⭐</button>
-          <button class="qbtn" onclick="event.stopPropagation();quickAddWs('${p.plugin_id}')" title="Add to Workspace">⚡</button>
+          <button class="qbtn" onclick="event.stopPropagation();quickFavorite('${p.plugin_id}')" title="Adicionar aos favoritos" aria-label="Adicionar aos favoritos">⭐</button>
+          <button class="qbtn" onclick="event.stopPropagation();quickAddWs('${p.plugin_id}')" title="Adicionar ao workspace" aria-label="Adicionar ao workspace">⚡</button>
         </span>
       </div>
     </div>`;
@@ -361,7 +361,7 @@ function renderPagination() {
   if (totalPages <= 1) { document.getElementById('pagination').innerHTML = ''; return; }
   let html = '';
   const range = 3;
-  if (currentPage > 1) html += `<button class="page-btn" onclick="goPage(${currentPage-1})">‹</button>`;
+  if (currentPage > 1) html += `<button class="page-btn" aria-label="Página anterior" onclick="goPage(${currentPage-1})">‹</button>`;
   for (let i = 1; i <= totalPages; i++) {
     if (i === 1 || i === totalPages || (i >= currentPage-range && i <= currentPage+range)) {
       html += `<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
@@ -369,7 +369,7 @@ function renderPagination() {
       html += `<button class="page-btn" disabled>…</button>`;
     }
   }
-  if (currentPage < totalPages) html += `<button class="page-btn" onclick="goPage(${currentPage+1})">›</button>`;
+  if (currentPage < totalPages) html += `<button class="page-btn" aria-label="Próxima página" onclick="goPage(${currentPage+1})">›</button>`;
   document.getElementById('pagination').innerHTML = html;
 }
 
@@ -653,7 +653,7 @@ function renderLists() {
       <div class="list-card-header"><h3>${list.name}</h3><span class="list-card-count">${list.plugins.length} plugins</span></div>
       ${list.description ? `<div class="list-card-desc">${list.description}</div>` : ''}
       <div class="list-card-items">${pluginDetails.length ? pluginDetails.map(p =>
-        `<div class="list-plugin-item"><span>${p.name}</span><button class="btn btn-sm btn-ghost" onclick="removeFromList('${list.id}','${p.plugin_id}')">✕</button></div>`
+        `<div class="list-plugin-item"><span>${p.name}</span><button class="btn btn-sm btn-ghost" onclick="removeFromList('${list.id}','${p.plugin_id}')" aria-label="Remover da lista" title="Remover da lista">✕</button></div>`
       ).join('') : '<div style="color:var(--text-muted);font-size:.8rem;padding:.5rem 0">Lista vazia — adicione plugins pelo Explorer</div>'}</div>
       <div class="list-card-footer">
         <button class="btn btn-sm btn-ghost" onclick="exportList('${list.id}')">⬇ Exportar JSON</button>
@@ -813,7 +813,7 @@ function renderWorkspaces() {
             <label class="toggle"><input type="checkbox" ${wp.enabled?'checked':''} onchange="toggleWsPlugin('${ws.id}','${wp.plugin_id}',this.checked)"><span class="toggle-slider" style="--accent:${ws.color}"></span></label>
             <span class="ws-plugin-name" onclick="showPluginDetail('${p.plugin_id}')">${p.name}</span>
             <span class="ws-plugin-meta">v${p.version}</span>
-            <button class="btn btn-sm btn-ghost" onclick="removeWsPlugin('${ws.id}','${wp.plugin_id}')" title="Remover">✕</button>
+            <button class="btn btn-sm btn-ghost" onclick="removeWsPlugin('${ws.id}','${wp.plugin_id}')" title="Remover" aria-label="Remover">✕</button>
           </div>`;
         }).join('')}
         ${!ws.plugins.length ? '<div style="color:var(--text-muted);font-size:.8rem;padding:.5rem;grid-column:1/-1">Busque e adicione plugins acima ↑</div>' : ''}
@@ -821,7 +821,7 @@ function renderWorkspaces() {
       <div class="ws-card-footer">
         <button class="btn btn-sm btn-accent" onclick="generateQGISScript('${ws.id}')">🐍 Gerar Script QGIS</button>
         <button class="btn btn-sm btn-ghost" onclick="exportWorkspace('${ws.id}')">⬇ Exportar JSON</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteWorkspace('${ws.id}')">🗑</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteWorkspace('${ws.id}')" aria-label="Excluir workspace" title="Excluir workspace">🗑</button>
       </div>
     </div>`;
   }).join('');
