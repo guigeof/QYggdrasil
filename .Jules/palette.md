@@ -1,0 +1,3 @@
+## 2024-09-04 - Icon-only Buttons Require Localized ARIA Labels
+**Learning:** The app makes extensive use of icon-only buttons (like `✕`, `🗑`, modals' close button `&times;`, etc.) generated both statically in HTML and dynamically in JavaScript without any `aria-label` or `title` attributes. Given the UI language is Portuguese (pt-BR), it's crucial to provide screen reader users with translated context to make these interactions clear.
+**Action:** Always verify that icon-only buttons receive an `aria-label` attribute, and potentially a `title` for visual users, translating the text into Portuguese to respect the app's established locale.
