@@ -1,0 +1,4 @@
+## 2024-03-20 - Custom i18n scripts and ARIA labels
+**Learning:** The custom `.applyI18n()` translation function in `web/js/app.js` works by replacing the `.textContent` of elements containing the `data-i18n` attribute. While this works fine for text-only spans and headings, applying `data-i18n` to a `<button>` that contains an icon (e.g., `<button data-i18n="close">&times;</button>`) results in the icon being completely erased and replaced by the translated string.
+
+**Action:** When adding accessibility to icon-only interactive elements in environments with such custom i18n logic, do not use the translation attribute on the interactive element itself. Instead, hardcode the `aria-label` attribute in the application's primary language (in this case, Portuguese) to ensure screen readers provide context without the UI breaking.
