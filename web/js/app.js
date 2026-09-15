@@ -821,7 +821,7 @@ function renderWorkspaces() {
       <div class="ws-card-footer">
         <button class="btn btn-sm btn-accent" onclick="generateQGISScript('${ws.id}')">🐍 Gerar Script QGIS</button>
         <button class="btn btn-sm btn-ghost" onclick="exportWorkspace('${ws.id}')">⬇ Exportar JSON</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteWorkspace('${ws.id}')">🗑</button>
+        <button class="btn btn-sm btn-danger" aria-label="Excluir workspace" onclick="deleteWorkspace('${ws.id}')">🗑</button>
       </div>
     </div>`;
   }).join('');
