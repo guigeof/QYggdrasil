@@ -56,7 +56,7 @@
                     </svg>
                     <span class="sidebar-brand">QYggdrasil</span>
                 </div>
-                <select id="lang-selector" class="select-sm"
+                <select id="lang-selector" class="select-sm" aria-label="Selecionar idioma"
                     style="margin-left:auto;width:55px;height:24px;font-size:11px;padding:0 4px;border-radius:4px">
                     <option value="en">EN</option>
                     <option value="pt">PT</option>
@@ -354,7 +354,7 @@
                     <div class="taxonomy-sidebar">
                         <div class="taxonomy-search">
                             <input type="text" id="taxonomy-search-input" data-i18n="search_tree"
-                                placeholder="Search tree..." class="input">
+                                placeholder="Search tree..." class="input" aria-label="Buscar na árvore">
                         </div>
                         <div class="tree-container" id="taxonomy-tree"></div>
                     </div>
@@ -392,10 +392,10 @@
                             <line x1="21" y1="21" x2="16.65" y2="16.65" />
                         </svg>
                         <input type="text" id="explorer-search"
-                            placeholder="Buscar plugins por nome, descrição, tag, autor..." class="input">
+                            placeholder="Buscar plugins por nome, descrição, tag, autor..." class="input" aria-label="Buscar plugins">
                     </div>
                     <div class="filter-group">
-                        <select id="filter-sort" class="select">
+                        <select id="filter-sort" class="select" aria-label="Ordenar por">
                             <option value="downloads">Mais Baixados</option>
                             <option value="rating">Melhor Avaliados</option>
                             <option value="name">Nome (A-Z)</option>
@@ -403,14 +403,14 @@
                             <option value="created">Mais Antigos</option>
                             <option value="votes">Mais Votados</option>
                         </select>
-                        <select id="filter-status" class="select">
+                        <select id="filter-status" class="select" aria-label="Filtrar por status">
                             <option value="all">Todos</option>
                             <option value="stable">Estável</option>
                             <option value="experimental">Experimental</option>
                             <option value="trusted">Confiável</option>
                             <option value="deprecated">Descontinuado</option>
                         </select>
-                        <button class="btn btn-outline" id="btn-toggle-view" title="Alternar visualização">
+                        <button class="btn btn-outline" id="btn-toggle-view" title="Alternar visualização" aria-label="Alternar visualização">
                             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
                                 stroke-width="2">
                                 <rect x="3" y="3" width="7" height="7" />
@@ -567,7 +567,7 @@
     <!-- Plugin Detail Modal -->
     <div class="modal-overlay" id="modal-overlay">
         <div class="modal" id="plugin-modal">
-            <button class="modal-close" id="modal-close">&times;</button>
+            <button class="modal-close" id="modal-close" aria-label="Fechar">&times;</button>
             <div class="modal-content" id="modal-content"></div>
         </div>
     </div>
@@ -575,7 +575,7 @@
     <!-- New List Modal -->
     <div class="modal-overlay" id="new-list-modal-overlay">
         <div class="modal modal-sm" id="new-list-modal">
-            <button class="modal-close" id="new-list-modal-close">&times;</button>
+            <button class="modal-close" id="new-list-modal-close" aria-label="Fechar">&times;</button>
             <div class="modal-content">
                 <h2>Nova Lista</h2>
                 <div class="form-group">
@@ -598,7 +598,7 @@
     <!-- New Workspace Modal -->
     <div class="modal-overlay" id="ws-modal-overlay">
         <div class="modal modal-sm" id="ws-modal">
-            <button class="modal-close"
+            <button class="modal-close" aria-label="Fechar"
                 onclick="document.getElementById('ws-modal-overlay').classList.remove('show')">&times;</button>
             <div class="modal-content">
                 <h2>Novo Workspace</h2>
@@ -634,7 +634,7 @@
     <!-- Plugin Guide Modal -->
     <div class="modal-overlay" id="plugin-guide-modal-overlay">
         <div class="modal modal-md" id="plugin-guide-modal">
-            <button class="modal-close" onclick="document.getElementById('plugin-guide-modal-overlay').classList.remove('show')">&times;</button>
+            <button class="modal-close" aria-label="Fechar" onclick="document.getElementById('plugin-guide-modal-overlay').classList.remove('show')">&times;</button>
             <div class="modal-content">
                 <h2>🔌 QYggdrasil Workspace Manager — Guia Completo</h2>
                 <p style="color:var(--text-secondary);font-size:.9rem;margin-bottom:1.25rem">
