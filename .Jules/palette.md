@@ -1,0 +1,3 @@
+## 2025-02-05 - Localized ARIA Labels for Icon-Only Buttons
+**Learning:** In a translated application, relying on pure icon buttons without ARIA labels creates severe accessibility gaps for screen readers, as the meaning is lost. Furthermore, hardcoded ARIA labels must be in the UI's primary language (e.g., pt-BR) or properly hooked into the translation system to ensure WCAG compliance and avoid screen reader confusion.
+**Action:** Always add `aria-label` attributes to icon-only buttons (like '✕' or '🗑' or '×'). In apps with a specific localized primary language, explicitly localize these labels (e.g., "Fechar", "Remover", "Excluir workspace") so native screen readers pronounce them correctly.
