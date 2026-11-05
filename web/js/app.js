@@ -348,8 +348,8 @@ function renderPluginGrid() {
         <span class="plugin-stat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>${fmt(p.downloads)}</span>
         <span class="plugin-stat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>${p.average_vote.toFixed(1)}</span>
         <span class="plugin-card-quick">
-          <button class="qbtn" onclick="event.stopPropagation();quickFavorite('${p.plugin_id}')" title="Add to Favorites">⭐</button>
-          <button class="qbtn" onclick="event.stopPropagation();quickAddWs('${p.plugin_id}')" title="Add to Workspace">⚡</button>
+          <button class="qbtn" onclick="event.stopPropagation();quickFavorite('${p.plugin_id}')" title="Adicionar aos Favoritos" aria-label="Adicionar aos Favoritos">⭐</button>
+          <button class="qbtn" onclick="event.stopPropagation();quickAddWs('${p.plugin_id}')" title="Adicionar ao Workspace" aria-label="Adicionar ao Workspace">⚡</button>
         </span>
       </div>
     </div>`;
@@ -813,7 +813,7 @@ function renderWorkspaces() {
             <label class="toggle"><input type="checkbox" ${wp.enabled?'checked':''} onchange="toggleWsPlugin('${ws.id}','${wp.plugin_id}',this.checked)"><span class="toggle-slider" style="--accent:${ws.color}"></span></label>
             <span class="ws-plugin-name" onclick="showPluginDetail('${p.plugin_id}')">${p.name}</span>
             <span class="ws-plugin-meta">v${p.version}</span>
-            <button class="btn btn-sm btn-ghost" onclick="removeWsPlugin('${ws.id}','${wp.plugin_id}')" title="Remover">✕</button>
+            <button class="btn btn-sm btn-ghost" onclick="removeWsPlugin('${ws.id}','${wp.plugin_id}')" title="Remover" aria-label="Remover">✕</button>
           </div>`;
         }).join('')}
         ${!ws.plugins.length ? '<div style="color:var(--text-muted);font-size:.8rem;padding:.5rem;grid-column:1/-1">Busque e adicione plugins acima ↑</div>' : ''}
