@@ -1,0 +1,3 @@
+## 2026-08-30 - Ensure ARIA labels match UI Language
+**Learning:** Adding accessibility features like `aria-label` requires careful attention to the application's primary language. In a Portuguese UI, adding English ARIA labels (e.g., `aria-label="Delete"`) causes WCAG violations (Label in Name criterion) and creates a confusing experience for screen reader users. Also, if a button already has visible text, adding an `aria-label` overrides it, which is incorrect.
+**Action:** Always verify the UI language (e.g., by checking `<html lang="pt-BR">`) and localize all accessibility attributes accordingly. Only add `aria-label` to icon-only buttons, and never to buttons that already have descriptive visible text.
