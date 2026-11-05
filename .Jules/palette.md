@@ -1,0 +1,3 @@
+## 2025-01-24 - Added localized aria-labels to icon-only buttons
+**Learning:** This app heavily uses JavaScript template literals to render UI components containing icon-only buttons (like emojis or SVGs without visible text). Because translation logic (`data-i18n` and custom `applyI18n()` functions) relies on textContent replacement, adding `aria-label` manually localized in Portuguese (the app's primary language) directly to the HTML string generation was necessary to provide screen reader accessibility without breaking the visual layout.
+**Action:** Always check both static HTML files and JavaScript template literals (`*.js`) for icon-only interactive elements to ensure they have appropriate localized `aria-label`s for screen reader accessibility.
