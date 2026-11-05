@@ -1,0 +1,3 @@
+## 2026-09-07 - [Added accessible names to modal close buttons]
+**Learning:** Icon-only modal close buttons (using HTML entities like `&times;`) frequently lack ARIA labels, creating accessibility issues. Furthermore, since the `app.js` translation function does not support localized attributes using `data-i18n` on icon-only buttons (it replaces the inner HTML), accessibility attributes must be explicitly hardcoded to match the app's primary language (Portuguese, "pt-BR").
+**Action:** When adding ARIA labels or titles to components in this app, ensure they are explicitly set to Portuguese (e.g., `aria-label="Fechar"`) to avoid language mismatch and screen reader confusion.
