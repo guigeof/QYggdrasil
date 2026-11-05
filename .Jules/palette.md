@@ -1,0 +1,3 @@
+## 2024-09-06 - ARIA labels for icon-only buttons with translation logic
+**Learning:** In this application, the custom `applyI18n()` translation function replaces the `textContent` of elements containing the `data-i18n` attribute. Applying `data-i18n` to icon-only HTML buttons (which use inline SVGs) causes the inner SVG to be overwritten and replaced by the translated text string.
+**Action:** For icon-only buttons, rely on `aria-label`s for accessibility and ensure the labels are hardcoded in the primary UI language (pt-BR) or handled via a separate translation mechanism that does not destroy inner HTML elements.
