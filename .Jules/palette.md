@@ -1,0 +1,3 @@
+## 2025-05-18 - Missing ARIA Labels on Icon-only Buttons
+**Learning:** Found a widespread pattern in this application where both statically defined (e.g., modals) and dynamically generated (e.g., pagination, lists, workspaces) icon-only buttons lacked `aria-label` attributes. Additionally, some `title` attributes were hardcoded in English instead of localized in Portuguese, causing screen readers to misinterpret the actions.
+**Action:** Always verify all JS template literals generating UI components for accessibility. Specifically, ensure all icon-only buttons (`×`, `🗑`, `‹`, `›`, `⭐`, `⚡`) have descriptive `aria-label` attributes in Portuguese to align with the application's primary UI language and improve WCAG compliance.
