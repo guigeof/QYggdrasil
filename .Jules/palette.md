@@ -1,0 +1,3 @@
+## 2025-09-15 - ARIA Labels and i18n
+**Learning:** Naive internationalization implementations via `data-i18n` might cause unexpected text replacement on icon-only buttons if not properly handled, destroying the visual presentation. When the UI language is fixed to Portuguese (pt-BR), it's important to provide `aria-label` values directly in Portuguese and avoid wrapping icon elements with `.textContent` overrides that strip nested SVGs.
+**Action:** When adding accessibility properties (like `aria-label`) to icon-only buttons in applications using simplistic script-based i18n that replaces `textContent`, add the localized string directly to the `aria-label` attribute and avoid adding `data-i18n` to elements containing pure HTML tags.
