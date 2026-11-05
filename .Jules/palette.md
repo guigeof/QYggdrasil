@@ -1,0 +1,3 @@
+## 2025-05-18 - Missing ARIA Labels on Icon-only Buttons
+**Learning:** Icon-only buttons lack accessibility when they don't have aria-labels to denote their action to screen reader users. Specifically in this application, several action buttons (e.g., closing modals, toggling views, quick add to favorite/workspace) are rendered via dynamically generated javascript and static html without accessible text, causing screen readers to improperly announce them.
+**Action:** Always verify that interactive icon-only elements contain an `aria-label` attribute (in the localized language, e.g., Portuguese "pt-BR"). Ensure this is checked in both static HTML elements and buttons dynamically generated inside JS template literals.
