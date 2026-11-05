@@ -1,0 +1,3 @@
+## 2026-09-20 - Accessibility on icon-only buttons with translations
+**Learning:** The custom `applyI18n()` function in `web/js/app.js` replaces `textContent`. Using `data-i18n` on icon-only HTML buttons (like modals with `&times;` or SVGs) will overwrite and replace the inner icon elements with text. Screen readers may announce `&times;` as "multiplication".
+**Action:** Do not use `data-i18n` on icon-only buttons. Instead, add a hardcoded `aria-label` translated in Portuguese (`pt-BR`) to avoid WCAG violations and ensure screen readers announce the action correctly without breaking the visual elements.
