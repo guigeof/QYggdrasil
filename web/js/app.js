@@ -366,7 +366,7 @@ function renderPagination() {
     if (i === 1 || i === totalPages || (i >= currentPage-range && i <= currentPage+range)) {
       html += `<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
     } else if (i === currentPage-range-1 || i === currentPage+range+1) {
-      html += `<button class="page-btn" disabled>…</button>`;
+      html += `<button class="page-btn" disabled aria-hidden="true">…</button>`;
     }
   }
   if (currentPage < totalPages) html += `<button class="page-btn" aria-label="Próxima página" onclick="goPage(${currentPage+1})">›</button>`;
